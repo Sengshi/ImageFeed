@@ -22,6 +22,7 @@ final class SingleImageViewController: UIViewController {
             activityItems: [image], // Передаем изображение
             applicationActivities: nil // Дополнительные активности
         )
+        activityViewController.overrideUserInterfaceStyle = .dark
         // Показываем UIActivityViewController
         present(activityViewController, animated: true, completion: nil)
 
