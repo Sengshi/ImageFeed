@@ -8,14 +8,26 @@
 import UIKit
 
 final class SingleImageViewController: UIViewController {
-    @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet private weak var imageView: UIImageView!
+    @IBOutlet private weak var scrollView: UIScrollView!
     
-    @IBAction func didTapShareButton(_ sender: Any) {
-        
+    @IBAction private func didTapShareButton(_ sender: Any) {
+        // Проверяем, что изображение доступно
+        guard let image = image else {
+            print("Изображение недоступно.")
+            return
+        }
+        // Создаем UIActivityViewController
+        let activityViewController = UIActivityViewController(
+            activityItems: [image], // Передаем изображение
+            applicationActivities: nil // Дополнительные активности
+        )
+        // Показываем UIActivityViewController
+        present(activityViewController, animated: true, completion: nil)
+
     }
     
-    @IBAction func didTapBackButton(_ sender: Any) {
+    @IBAction private func didTapBackButton(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
     
