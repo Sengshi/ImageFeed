@@ -92,7 +92,7 @@ final class ProfileViewController: UIViewController {
             loginNameLabel.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 8),
             loginNameLabel.leadingAnchor.constraint(equalTo: avatarImage.leadingAnchor, constant: 0),
             loginNameLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 16),
-
+            
             // Констрейнты для descriptionLabel
             descriptionLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: 8),
             descriptionLabel.leadingAnchor.constraint(equalTo: avatarImage.leadingAnchor, constant: 0),
@@ -106,7 +106,7 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    // MARK: - Actions
+    // Actions
     @objc private func didTapLogoutButton(_ sender: Any) {
         // Обработка нажатия на кнопку выхода
         print("Logout button tapped")
