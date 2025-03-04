@@ -10,20 +10,37 @@ import UIKit
 final class SplashViewController: UIViewController {
     private let storage = OAuth2TokenStorage.shared
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
+    private var logoImage : UIImageView! = UIImageView()
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 26, green: 27, blue: 34, alpha: 1)
+        setupLogoImage()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        if let token = storage.token {
+        if storage.token != nil {
             switchToTabBarController()
         } else {
             switchToAuthViewController()
         }
     }
-
+    
+    private func setupLogoImage() {
+        logoImage.image = UIImage(named: "splash_screen_logo")
+        logoImage.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(logoImage)
+        NSLayoutConstraint.activate([
+            logoImage.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            logoImage.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+        ])
+    }
+    
     private func switchToTabBarController() {
         guard let window = UIApplication.shared.windows.first else {
-            assertionFailure("Invalid window configuration")
+            assertionFailure("Не удалось получить window")
             return
         }
 

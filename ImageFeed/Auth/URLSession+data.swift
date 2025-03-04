@@ -32,6 +32,7 @@ final class OAuth2Service {
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let baseURL = URL(string: "https://unsplash.com/oauth/token") else {
+            print("Ошибка: Не удалось создать baseURL")
             return nil
         }
         
@@ -45,6 +46,7 @@ final class OAuth2Service {
         ]
         
         guard let url = urlComponents?.url else {
+            print("Ошибка: Не удалось создать URL из URLComponents")
             return nil
         }
         
@@ -57,6 +59,7 @@ final class OAuth2Service {
         assert(Thread.isMainThread) // Убедимся, что метод вызывается на главном потоке
         
         guard lastCode != code else {
+            print("Ошибка: Повторный запрос с тем же кодом")
             return
         }
         
@@ -64,6 +67,7 @@ final class OAuth2Service {
         lastCode = code
         
         guard let request = makeOAuthTokenRequest(code: code) else {
+            print("Ошибка: Не удалось создать URLRequest")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
