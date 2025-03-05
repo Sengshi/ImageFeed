@@ -47,11 +47,6 @@ final class WebViewViewController: UIViewController {
 
     private func setupWebView() {
         webView = WKWebView(frame: view.bounds)
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
     }
@@ -109,6 +104,10 @@ final class WebViewViewController: UIViewController {
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
+    }
+    
+    deinit {
+        estimatedProgressObservation = nil
     }
     
 }

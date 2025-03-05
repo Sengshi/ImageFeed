@@ -6,11 +6,13 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
     private let profileService = ProfileService.shared
-    
+    private let profileImageService = ProfileImageService.shared
+
     private var avatarImage: UIImageView! = UIImageView()
     private var logoutButton: UIButton! = UIButton(type: .custom)
     private var userNameLabel: UILabel! = UILabel()
@@ -19,6 +21,7 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 26, green: 27, blue: 34, alpha: 1)
         setupAvatarImage()
         setupUserNameLabel()
         setupLoginNameLabel()
@@ -30,7 +33,7 @@ final class ProfileViewController: UIViewController {
     
     // Setup Avatar Image
     private func setupAvatarImage() {
-        avatarImage.image = UIImage(named: "avatar_image") // Замените на ваше изображение
+        avatarImage.image = UIImage(named: "placeholder")
         avatarImage.contentMode = .scaleAspectFit
         avatarImage.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(avatarImage)
@@ -120,16 +123,61 @@ final class ProfileViewController: UIViewController {
             switch result {
             case .success(let profile):
                 self.updateUI(with: profile)
+                self.fetchProfileImageURL(username: profile.username)
             case .failure(let error):
                 print("Ошибка при загрузке профиля: \(error.localizedDescription)")
             }
         }
+        
+    }
+    
+    private func fetchProfileImageURL(username: String) {
+        profileImageService.fetchProfileImageURL(username: username) { [weak self] result in
+            guard let self = self else { return }
+
+            switch result {
+            case .success(let avatarURL):
+                // Загружаем аватарку по URL
+                self.loadAvatarImage(from: avatarURL)
+
+            case .failure(let error):
+                self.showErrorAlert(message: "Ошибка при загрузке аватарки: \(error.localizedDescription)")
+            }
+        }
     }
 
+    private func loadAvatarImage(from urlString: String) {
+        guard let url = URL(string: urlString) else {
+            print("Ошибка: Не удалось создать URL для аватарки")
+            return
+        }
+        // Используем Kingfisher для загрузки изображения
+        let processor = RoundCornerImageProcessor(cornerRadius: 100)
+        avatarImage.kf.indicatorType = .activity
+        avatarImage.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "placeholder"), // Заглушка, пока изображение загружается
+            options: [
+                .transition(.fade(0.5)),
+                .processor(processor)
+            ]
+        )
+    }
+    
     private func updateUI(with profile: Profile) {
         userNameLabel.text = profile.name
         loginNameLabel.text = profile.loginName
         descriptionLabel.text = profile.bio
+    }
+    
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 
 }
