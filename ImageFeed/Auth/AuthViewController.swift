@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ProgressHUD
 
 final class AuthViewController: UIViewController {
     
@@ -64,9 +65,11 @@ final class AuthViewController: UIViewController {
     }
     
     @objc private func loginButtonTapped() {
-        let webViewViewController = WebViewViewController()
-        webViewViewController.delegate = self
-        navigationController?.pushViewController(webViewViewController, animated: true)
+        if !UIBlockingProgressHUD.isShowing() {
+            let webViewViewController = WebViewViewController()
+            webViewViewController.delegate = self
+            navigationController?.pushViewController(webViewViewController, animated: true)
+        }
     }
     
     private func setupBackButton() {
@@ -82,15 +85,17 @@ final class AuthViewController: UIViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         vc.dismiss(animated: true)
+        UIBlockingProgressHUD.show()
         OAuth2Service.shared.fetchOAuthToken(code: code) { result in
+            UIBlockingProgressHUD.dismiss()
             switch result {
             case .success(let accessToken):
                 print("Токен получен: \(accessToken)")
                 OAuth2TokenStorage.shared.token = accessToken
                 self.delegate?.didAuthenticate(self)
-            case .failure(let error):
-                print("Ошибка при получении токена: \(error.localizedDescription)")
-                self.showErrorAlert(message: error.localizedDescription)
+            case .failure(_):
+                print("[AuthViewController]: Ошибка при получении токена")
+                self.showErrorAlert()
             }
         }
     }
@@ -99,11 +104,13 @@ extension AuthViewController: WebViewViewControllerDelegate {
         navigationController?.popViewController(animated: true)
     }
 
-    private func showErrorAlert(message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
+    private func showErrorAlert() {
+            let alert = UIAlertController(title: "Что-то пошло не так",
+                                          message: "Не удалось войти в систему",
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+        }
 }
 
 protocol AuthViewControllerDelegate: AnyObject {

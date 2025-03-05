@@ -9,11 +9,13 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
-    private var avatarImage: UIImageView!
-    private var logoutButton: UIButton!
-    private var userNameLabel: UILabel!
-    private var loginNameLabel: UILabel!
-    private var descriptionLabel: UILabel!
+    private let profileService = ProfileService.shared
+    
+    private var avatarImage: UIImageView! = UIImageView()
+    private var logoutButton: UIButton! = UIButton(type: .custom)
+    private var userNameLabel: UILabel! = UILabel()
+    private var loginNameLabel: UILabel! = UILabel()
+    private var descriptionLabel: UILabel! = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,11 +25,11 @@ final class ProfileViewController: UIViewController {
         setupDescriptionLabel()
         setupLogoutButton()
         setupConstraints()
+        loadProfile()
     }
     
     // Setup Avatar Image
     private func setupAvatarImage() {
-        avatarImage = UIImageView()
         avatarImage.image = UIImage(named: "avatar_image") // Замените на ваше изображение
         avatarImage.contentMode = .scaleAspectFit
         avatarImage.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +38,6 @@ final class ProfileViewController: UIViewController {
     
     // Setup User Name Label
     private func setupUserNameLabel() {
-        userNameLabel = UILabel()
         userNameLabel.text = "Екатерина Новикова"
         userNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         userNameLabel.textColor = .white
@@ -46,7 +47,6 @@ final class ProfileViewController: UIViewController {
     
     // Setup Login Name Label
     private func setupLoginNameLabel() {
-        loginNameLabel = UILabel()
         loginNameLabel.text = "@ekaterina_nov"
         loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         loginNameLabel.textColor = UIColor.init(red: 174, green: 175, blue: 180, alpha: 1)
@@ -56,7 +56,6 @@ final class ProfileViewController: UIViewController {
     
     // Setup Description Label
     private func setupDescriptionLabel() {
-        descriptionLabel = UILabel()
         descriptionLabel.text = "Hello, world!"
         descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.textColor = .white
@@ -67,7 +66,6 @@ final class ProfileViewController: UIViewController {
     
     // Setup Logout Button
     private func setupLogoutButton() {
-        logoutButton = UIButton(type: .custom)
         logoutButton.setImage(UIImage(named: "logout_button"), for: .normal)
         logoutButton.addTarget(self, action: #selector(didTapLogoutButton(_:)), for: .touchUpInside)
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
@@ -111,4 +109,27 @@ final class ProfileViewController: UIViewController {
         // Обработка нажатия на кнопку выхода
         print("Logout button tapped")
     }
+    
+    private func loadProfile() {
+        guard let token = OAuth2TokenStorage.shared.token else {
+            print("Ошибка: Токен отсутствует")
+            return
+        }
+
+        profileService.fetchProfile(token) { result in
+            switch result {
+            case .success(let profile):
+                self.updateUI(with: profile)
+            case .failure(let error):
+                print("Ошибка при загрузке профиля: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func updateUI(with profile: Profile) {
+        userNameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+
 }
