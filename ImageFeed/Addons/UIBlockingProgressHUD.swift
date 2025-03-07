@@ -10,7 +10,7 @@ import ProgressHUD
 
 final class UIBlockingProgressHUD {
     private static var window: UIWindow? {
-        return UIApplication.shared.windows.first
+        UIApplication.shared.windows.first
     }
     
     static func show() {
@@ -24,6 +24,6 @@ final class UIBlockingProgressHUD {
     }
     
     static func isShowing() -> Bool {
-        return ProgressHUD.isSubclass(of: UIWindow.self)
+        ProgressHUD.isSubclass(of: UIWindow.self)
     }
 }

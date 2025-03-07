@@ -16,7 +16,7 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet var likeButton: UIButton!
     
     private var gradientLayer: CAGradientLayer?
-
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         setupCornerRadius()
@@ -44,7 +44,7 @@ final class ImagesListCell: UITableViewCell {
         cellImage.layer.cornerRadius = 16
         cellImage.clipsToBounds = true
     }
-
+    
     private func setupGradient() {
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [UIColor.clear.cgColor, UIColor(red: 26, green: 27, blue: 34).cgColor]

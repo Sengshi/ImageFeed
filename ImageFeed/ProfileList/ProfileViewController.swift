@@ -12,12 +12,12 @@ final class ProfileViewController: UIViewController {
     
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
-
-    private var avatarImage: UIImageView! = UIImageView()
-    private var logoutButton: UIButton! = UIButton(type: .custom)
-    private var userNameLabel: UILabel! = UILabel()
-    private var loginNameLabel: UILabel! = UILabel()
-    private var descriptionLabel: UILabel! = UILabel()
+    
+    private var avatarImage: UIImageView = UIImageView()
+    private var logoutButton: UIButton = UIButton(type: .custom)
+    private var userNameLabel: UILabel = UILabel()
+    private var loginNameLabel: UILabel = UILabel()
+    private var descriptionLabel: UILabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -118,7 +118,7 @@ final class ProfileViewController: UIViewController {
             print("Ошибка: Токен отсутствует")
             return
         }
-
+        
         profileService.fetchProfile(token) { result in
             switch result {
             case .success(let profile):
@@ -134,18 +134,18 @@ final class ProfileViewController: UIViewController {
     private func fetchProfileImageURL(username: String) {
         profileImageService.fetchProfileImageURL(username: username) { [weak self] result in
             guard let self = self else { return }
-
+            
             switch result {
             case .success(let avatarURL):
                 // Загружаем аватарку по URL
                 self.loadAvatarImage(from: avatarURL)
-
+                
             case .failure(let error):
                 self.showErrorAlert(message: "Ошибка при загрузке аватарки: \(error.localizedDescription)")
             }
         }
     }
-
+    
     private func loadAvatarImage(from urlString: String) {
         guard let url = URL(string: urlString) else {
             print("Ошибка: Не удалось создать URL для аватарки")
@@ -179,5 +179,5 @@ final class ProfileViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-
+    
 }

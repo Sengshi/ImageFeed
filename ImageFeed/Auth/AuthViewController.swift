@@ -11,7 +11,7 @@ import ProgressHUD
 final class AuthViewController: UIViewController {
     
     weak var delegate: AuthViewControllerDelegate?
-
+    
     private var logoImage: UIImageView! = UIImageView()
     private var loginButton: UIButton! = UIButton(type: .custom)
     
@@ -60,7 +60,7 @@ final class AuthViewController: UIViewController {
             loginButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             loginButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             loginButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -90),
-
+            
         ])
     }
     
@@ -78,39 +78,8 @@ final class AuthViewController: UIViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationItem.backBarButtonItem?.tintColor = UIColor(named: "ypBlack")
     }
-
     
-}
-
-extension AuthViewController: WebViewViewControllerDelegate {
-    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        vc.dismiss(animated: true)
-        UIBlockingProgressHUD.show()
-        OAuth2Service.shared.fetchOAuthToken(code: code) { result in
-            UIBlockingProgressHUD.dismiss()
-            switch result {
-            case .success(let accessToken):
-                print("Токен получен: \(accessToken)")
-                OAuth2TokenStorage.shared.token = accessToken
-                self.delegate?.didAuthenticate(self)
-            case .failure(_):
-                print("[AuthViewController]: Ошибка при получении токена")
-                self.showErrorAlert()
-            }
-        }
-    }
-
-    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        navigationController?.popViewController(animated: true)
-    }
-
-    private func showErrorAlert() {
-            let alert = UIAlertController(title: "Что-то пошло не так",
-                                          message: "Не удалось войти в систему",
-                                          preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alert, animated: true)
-        }
+    
 }
 
 protocol AuthViewControllerDelegate: AnyObject {
