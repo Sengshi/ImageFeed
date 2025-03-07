@@ -17,7 +17,16 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .success(let accessToken):
                 print("Токен получен: \(accessToken)")
                 OAuth2TokenStorage.shared.token = accessToken
-                self.delegate?.didAuthenticate(self)
+                ProfileService.shared.fetchProfile(accessToken) { profileResult in
+                    switch profileResult {
+                    case .success(let profile):
+                        print("Профиль загружен: \(profile)")
+                        self.delegate?.didAuthenticate(self)
+                    case .failure(let error):
+                        print("[AuthViewController]: Ошибка загрузки профиля - \(error.localizedDescription)")
+                        self.showErrorAlert()
+                    }
+                }
             case .failure:
                 print("[AuthViewController]: Ошибка при получении токена")
                 self.showErrorAlert()

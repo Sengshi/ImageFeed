@@ -26,7 +26,7 @@ final class AuthViewController: UIViewController {
     
     // Setup Logo Image
     private func setupLogoImage() {
-        logoImage.image = UIImage(named: "auth_logo") 
+        logoImage.image = UIImage(named: "auth_logo")
         logoImage.contentMode = .scaleAspectFit
         logoImage.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoImage)
@@ -65,11 +65,9 @@ final class AuthViewController: UIViewController {
     }
     
     @objc private func loginButtonTapped() {
-        if !UIBlockingProgressHUD.isShowing() {
-            let webViewViewController = WebViewViewController()
-            webViewViewController.delegate = self
-            navigationController?.pushViewController(webViewViewController, animated: true)
-        }
+        let webViewViewController = WebViewViewController()
+        webViewViewController.delegate = self
+        navigationController?.pushViewController(webViewViewController, animated: true)
     }
     
     private func setupBackButton() {

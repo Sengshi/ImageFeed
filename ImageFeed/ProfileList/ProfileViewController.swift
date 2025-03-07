@@ -35,6 +35,8 @@ final class ProfileViewController: UIViewController {
     private func setupAvatarImage() {
         avatarImage.image = UIImage(named: "placeholder")
         avatarImage.contentMode = .scaleAspectFit
+        avatarImage.layer.cornerRadius = avatarImage.frame.size.width / 2
+        avatarImage.layer.masksToBounds = true
         avatarImage.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(avatarImage)
     }
@@ -102,8 +104,8 @@ final class ProfileViewController: UIViewController {
             // Констрейнты для logoutButton
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: avatarImage.centerYAnchor),
-            avatarImage.widthAnchor.constraint(equalToConstant: 44),
-            avatarImage.heightAnchor.constraint(equalToConstant: 44),
+            logoutButton.widthAnchor.constraint(equalToConstant: 44),
+            logoutButton.heightAnchor.constraint(equalToConstant: 44),
         ])
     }
     
