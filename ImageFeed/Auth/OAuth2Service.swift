@@ -5,7 +5,7 @@
 //  Created by Денис Кель on 07.03.2025.
 //
 
-import UIKit
+import Foundation
 
 
 final class OAuth2Service {
@@ -16,32 +16,7 @@ final class OAuth2Service {
     private var lastCode: String?
     
     private init() {}
-    
-    private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        guard let baseURL = URL(string: "https://unsplash.com/oauth/token") else {
-            print("Ошибка: Не удалось создать baseURL")
-            return nil
-        }
         
-        var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
-        urlComponents?.queryItems = [
-            URLQueryItem(name: "client_id", value: Constants.accessKey),
-            URLQueryItem(name: "client_secret", value: Constants.secretKey),
-            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-            URLQueryItem(name: "code", value: code),
-            URLQueryItem(name: "grant_type", value: "authorization_code")
-        ]
-        
-        guard let url = urlComponents?.url else {
-            print("Ошибка: Не удалось создать URL из URLComponents")
-            return nil
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = HTTPMethod.post.rawValue
-        return request
-    }
-    
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
@@ -80,4 +55,30 @@ final class OAuth2Service {
         self.task = task
         task.resume()
     }
+    
+    private func makeOAuthTokenRequest(code: String) -> URLRequest? {
+        guard let baseURL = URL(string: "https://unsplash.com/oauth/token") else {
+            print("Ошибка: Не удалось создать baseURL")
+            return nil
+        }
+        
+        var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+        urlComponents?.queryItems = [
+            URLQueryItem(name: "client_id", value: Constants.accessKey),
+            URLQueryItem(name: "client_secret", value: Constants.secretKey),
+            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
+            URLQueryItem(name: "code", value: code),
+            URLQueryItem(name: "grant_type", value: "authorization_code")
+        ]
+        
+        guard let url = urlComponents?.url else {
+            print("Ошибка: Не удалось создать URL из URLComponents")
+            return nil
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.post.rawValue
+        return request
+    }
+
 }
