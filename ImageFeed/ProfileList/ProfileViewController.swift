@@ -6,37 +6,43 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
-    private var avatarImage: UIImageView!
-    private var logoutButton: UIButton!
-    private var userNameLabel: UILabel!
-    private var loginNameLabel: UILabel!
-    private var descriptionLabel: UILabel!
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
+    
+    private var avatarImage: UIImageView = UIImageView()
+    private var logoutButton: UIButton = UIButton(type: .custom)
+    private var userNameLabel: UILabel = UILabel()
+    private var loginNameLabel: UILabel = UILabel()
+    private var descriptionLabel: UILabel = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 26, green: 27, blue: 34, alpha: 1)
         setupAvatarImage()
         setupUserNameLabel()
         setupLoginNameLabel()
         setupDescriptionLabel()
         setupLogoutButton()
         setupConstraints()
+        loadProfile()
     }
     
     // Setup Avatar Image
     private func setupAvatarImage() {
-        avatarImage = UIImageView()
-        avatarImage.image = UIImage(named: "avatar_image") // Замените на ваше изображение
+        avatarImage.image = UIImage(named: "placeholder")
         avatarImage.contentMode = .scaleAspectFit
+        avatarImage.layer.cornerRadius = avatarImage.frame.size.width / 2
+        avatarImage.layer.masksToBounds = true
         avatarImage.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(avatarImage)
     }
     
     // Setup User Name Label
     private func setupUserNameLabel() {
-        userNameLabel = UILabel()
         userNameLabel.text = "Екатерина Новикова"
         userNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         userNameLabel.textColor = .white
@@ -46,7 +52,6 @@ final class ProfileViewController: UIViewController {
     
     // Setup Login Name Label
     private func setupLoginNameLabel() {
-        loginNameLabel = UILabel()
         loginNameLabel.text = "@ekaterina_nov"
         loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         loginNameLabel.textColor = UIColor.init(red: 174, green: 175, blue: 180, alpha: 1)
@@ -56,7 +61,6 @@ final class ProfileViewController: UIViewController {
     
     // Setup Description Label
     private func setupDescriptionLabel() {
-        descriptionLabel = UILabel()
         descriptionLabel.text = "Hello, world!"
         descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.textColor = .white
@@ -67,7 +71,6 @@ final class ProfileViewController: UIViewController {
     
     // Setup Logout Button
     private func setupLogoutButton() {
-        logoutButton = UIButton(type: .custom)
         logoutButton.setImage(UIImage(named: "logout_button"), for: .normal)
         logoutButton.addTarget(self, action: #selector(didTapLogoutButton(_:)), for: .touchUpInside)
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
@@ -101,8 +104,8 @@ final class ProfileViewController: UIViewController {
             // Констрейнты для logoutButton
             logoutButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             logoutButton.centerYAnchor.constraint(equalTo: avatarImage.centerYAnchor),
-            avatarImage.widthAnchor.constraint(equalToConstant: 44),
-            avatarImage.heightAnchor.constraint(equalToConstant: 44),
+            logoutButton.widthAnchor.constraint(equalToConstant: 44),
+            logoutButton.heightAnchor.constraint(equalToConstant: 44),
         ])
     }
     
@@ -111,4 +114,72 @@ final class ProfileViewController: UIViewController {
         // Обработка нажатия на кнопку выхода
         print("Logout button tapped")
     }
+    
+    private func loadProfile() {
+        guard let token = OAuth2TokenStorage.shared.token else {
+            print("Ошибка: Токен отсутствует")
+            return
+        }
+        
+        profileService.fetchProfile(token) { result in
+            switch result {
+            case .success(let profile):
+                self.updateUI(with: profile)
+                self.fetchProfileImageURL(username: profile.username)
+            case .failure(let error):
+                print("Ошибка при загрузке профиля: \(error.localizedDescription)")
+            }
+        }
+        
+    }
+    
+    private func fetchProfileImageURL(username: String) {
+        profileImageService.fetchProfileImageURL(username: username) { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let avatarURL):
+                // Загружаем аватарку по URL
+                self.loadAvatarImage(from: avatarURL)
+                
+            case .failure(let error):
+                self.showErrorAlert(message: "Ошибка при загрузке аватарки: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func loadAvatarImage(from urlString: String) {
+        guard let url = URL(string: urlString) else {
+            print("Ошибка: Не удалось создать URL для аватарки")
+            return
+        }
+        // Используем Kingfisher для загрузки изображения
+        let processor = RoundCornerImageProcessor(cornerRadius: 100)
+        avatarImage.kf.indicatorType = .activity
+        avatarImage.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "placeholder"), // Заглушка, пока изображение загружается
+            options: [
+                .transition(.fade(0.5)),
+                .processor(processor)
+            ]
+        )
+    }
+    
+    private func updateUI(with profile: Profile) {
+        userNameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+    
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
 }

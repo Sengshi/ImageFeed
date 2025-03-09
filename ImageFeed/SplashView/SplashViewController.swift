@@ -8,6 +8,8 @@
 import UIKit
 
 final class SplashViewController: UIViewController {
+    private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
     private let storage = OAuth2TokenStorage.shared
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private var logoImage : UIImageView! = UIImageView()
@@ -22,7 +24,7 @@ final class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
 
         if storage.token != nil {
-            switchToTabBarController()
+            fetchProfile(token: storage.token!)
         } else {
             switchToAuthViewController()
         }
@@ -57,14 +59,46 @@ final class SplashViewController: UIViewController {
         navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true)
     }
+    
+    private func fetchProfile(token: String) {
+        UIBlockingProgressHUD.show() // Показываем индикатор загрузки
+        profileService.fetchProfile(token) { [weak self] result in
+            UIBlockingProgressHUD.dismiss() // Скрываем индикатор загрузки
+
+            guard let self = self else { return }
+
+            switch result {
+            case .success (let profile):
+                profileImageService.fetchProfileImageURL(username: profile.username) { _ in }
+                // Если профиль успешно загружен, переходим к TabBarController
+                self.switchToTabBarController()
+            case .failure(let error):
+                // Если произошла ошибка, показываем сообщение об ошибке
+                self.showErrorAlert(message: "Ошибка при загрузке профиля: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(
+            title: "Ошибка",
+            message: message,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+
 }
-
-
 
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-        switchToTabBarController()
+        guard let token = storage.token else {
+            showErrorAlert(message: "Токен отсутствует")
+            return
+        }
+        fetchProfile(token: token)
     }
 }
 

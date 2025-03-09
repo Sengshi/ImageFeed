@@ -6,11 +6,12 @@
 //
 
 import UIKit
+import ProgressHUD
 
 final class AuthViewController: UIViewController {
     
     weak var delegate: AuthViewControllerDelegate?
-
+    
     private var logoImage: UIImageView! = UIImageView()
     private var loginButton: UIButton! = UIButton(type: .custom)
     
@@ -25,7 +26,7 @@ final class AuthViewController: UIViewController {
     
     // Setup Logo Image
     private func setupLogoImage() {
-        logoImage.image = UIImage(named: "auth_logo") 
+        logoImage.image = UIImage(named: "auth_logo")
         logoImage.contentMode = .scaleAspectFit
         logoImage.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoImage)
@@ -59,7 +60,7 @@ final class AuthViewController: UIViewController {
             loginButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             loginButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             loginButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -90),
-
+            
         ])
     }
     
@@ -75,35 +76,8 @@ final class AuthViewController: UIViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationItem.backBarButtonItem?.tintColor = UIColor(named: "ypBlack")
     }
-
     
-}
-
-extension AuthViewController: WebViewViewControllerDelegate {
-    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        vc.dismiss(animated: true)
-        OAuth2Service.shared.fetchOAuthToken(code: code) { result in
-            switch result {
-            case .success(let accessToken):
-                print("Токен получен: \(accessToken)")
-                OAuth2TokenStorage.shared.token = accessToken
-                self.delegate?.didAuthenticate(self)
-            case .failure(let error):
-                print("Ошибка при получении токена: \(error.localizedDescription)")
-                self.showErrorAlert(message: error.localizedDescription)
-            }
-        }
-    }
-
-    func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        navigationController?.popViewController(animated: true)
-    }
-
-    private func showErrorAlert(message: String) {
-        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
-    }
+    
 }
 
 protocol AuthViewControllerDelegate: AnyObject {
