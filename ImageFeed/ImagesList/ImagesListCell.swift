@@ -9,13 +9,18 @@ import UIKit
 
 final class ImagesListCell: UITableViewCell {
     static let reuseIdentifier = "ImagesListCell"
-    
+    private var gradientLayer: CAGradientLayer?
+    weak var delegate: ImagesListCellDelegate?
+
     @IBOutlet var cellImage: UIImageView!
     @IBOutlet var gradientView: UIView!
     @IBOutlet var dateLabel: UILabel!
     @IBOutlet var likeButton: UIButton!
     
-    private var gradientLayer: CAGradientLayer?
+    @IBAction private func likeButtonClicked() {
+        delegate?.imageListCellDidTapLike(self)
+    }
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -39,6 +44,7 @@ final class ImagesListCell: UITableViewCell {
         maskLayer.path = maskPath.cgPath
         gradientLayer?.mask = maskLayer
     }
+    
     
     private func setupCornerRadius() {
         cellImage.layer.cornerRadius = 16
@@ -81,4 +87,8 @@ extension UIColor {
             alpha: alpha
         )
     }
+}
+
+protocol ImagesListCellDelegate: AnyObject {
+    func imageListCellDidTapLike(_ cell: ImagesListCell)
 }

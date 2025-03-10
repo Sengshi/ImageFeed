@@ -112,7 +112,7 @@ final class ProfileViewController: UIViewController {
     // Actions
     @objc private func didTapLogoutButton(_ sender: Any) {
         // Обработка нажатия на кнопку выхода
-        print("Logout button tapped")
+        ProfileLogoutService.shared.logout()
     }
     
     private func loadProfile() {
