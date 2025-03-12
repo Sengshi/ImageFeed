@@ -97,6 +97,20 @@ final class ImagesListService {
                     completion(.failure(error))
                     return
                 }
+                
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    print("[ImagesListService]: Некорректный ответ сервера")
+                    completion(.failure(NetworkError.invalidResponse))
+                    return
+                }
+                
+                switch httpResponse.statusCode {
+                case 200..<300:
+                    completion(.success(()))
+                default:
+                    print("[ImagesListService]: Ошибка сервера - код \(httpResponse.statusCode)")
+                    completion(.failure(NetworkError.invalidResponse))
+                }
             }
         }
         

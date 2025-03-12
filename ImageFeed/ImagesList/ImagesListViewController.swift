@@ -89,8 +89,7 @@ extension ImagesListViewController {
         )
         cell.delegate = self
         
-        let isLiked = indexPath.row % 2 == 0
-        let likeImage = isLiked ? UIImage(named: "like_active") : UIImage(
+        let likeImage = image.isLiked ? UIImage(named: "like_active") : UIImage(
             named: "like_no_active"
         )
         cell.likeButton.setImage(likeImage, for: .normal)
@@ -154,19 +153,21 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        var photo = photos[indexPath.row]
+        let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
         ImagesListService.shared.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
-            guard self != nil else { return }
-            UIBlockingProgressHUD.dismiss()
-            switch result {
-            case .success():
-                photo.isLiked.toggle()
-                self?.photos[indexPath.row] = photo
-                self?.tableView.reloadRows(at: [indexPath], with: .automatic)
-            case .failure(let error):
-                print("Ошибка при изменении лайка: \(error.localizedDescription)")
-            }
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
+                guard let self = self else { return }
+                
+                switch result {
+                case .success:
+                    self.photos[indexPath.row].isLiked.toggle()
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                case .failure(let error):
+                    print("Ошибка при изменении лайка: \(error.localizedDescription)")
+                }
             }
         }
     }
+}

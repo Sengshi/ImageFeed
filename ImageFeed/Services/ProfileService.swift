@@ -10,7 +10,6 @@ import Foundation
 
 final class ProfileService {
     static let shared = ProfileService()
-    
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private var profile: Profile?
@@ -66,7 +65,7 @@ final class ProfileService {
         task?.cancel()
         task = nil
     }
-
+    
 }
 
 
