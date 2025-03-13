@@ -16,9 +16,10 @@ final class ImagesListService {
     private var task: URLSessionTask?
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     
+    private init() {}
     
     func fetchPhotosNextPage(_ completion: @escaping (Result<String, Error>) -> Void) {
-        task?.cancel()
+        guard task == nil else { return }
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("Ошибка: Токен отсутствует")
@@ -33,24 +34,32 @@ final class ImagesListService {
             return
         }
         
-        
-        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<[Photo], Error>) in
+        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 self.task = nil
-                
-                switch result {
-                case .success(let newPhotos):
+
+                if let error = error {
+                    print("[ImagesListService]: Ошибка при изменении лайка - \(error.localizedDescription)")
+                    completion(.failure(error))
+                    return
+                }
+
+                guard let data = data else {
+                    print("[ImagesListService]: Нет данных для обработки")
+                    completion(.failure(NetworkError.invalidResponse))
+                    return
+                }
+
+                do {
+                    let decoder = JSONDecoder()
+                    let newPhotosResult = try decoder.decode([PhotoResult].self, from: data)
+                    let newPhotos = newPhotosResult.map { Photo(from: $0) }
                     self.photos.append(contentsOf: newPhotos)
                     self.lastLoadedPage = nextPage
-                    
-                    NotificationCenter.default.post(
-                        name: ImagesListService.didChangeNotification,
-                        object: self
-                    )
-                    
-                case .failure(let error):
-                    print("[ImagesListService]: failed to dowload image with error - \(error.localizedDescription)")
+                    NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
+                } catch {
+                    print("[ImagesListService]: Ошибка при декодировании данных - \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
@@ -74,7 +83,7 @@ final class ImagesListService {
     }
     
     func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
-        task?.cancel()
+        guard task == nil else { return }
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("Ошибка: Токен отсутствует")

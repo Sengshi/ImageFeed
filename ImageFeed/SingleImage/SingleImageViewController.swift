@@ -27,7 +27,7 @@ final class SingleImageViewController: UIViewController {
         setupButtonShare()
         setupConstraints()
     }
-    
+
     // Приватные методы
     private func setupScrollView() {
         scrollView.minimumZoomScale = 0.1
@@ -44,21 +44,28 @@ final class SingleImageViewController: UIViewController {
         imageView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(imageView)
         UIBlockingProgressHUD.show()
-        if let url = imageURL {
-            imageView.kf.indicatorType = .activity
-            imageView.kf.setImage(
-                with: url,
-                placeholder: UIImage(named: "placeholder_full_image")
-            ) { [weak self] result in
-                UIBlockingProgressHUD.dismiss()
-                guard let self = self else { return }
-                switch result {
-                    case .success: self.updateImageScaleAndPosition()
-                    case .failure: print("Error downloading image")
-                }
-                
-            }
+        
+        guard let url = imageURL else {
+            UIBlockingProgressHUD.dismiss()
+            return
         }
+        
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "placeholder_full_image")
+        ) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                self.view.layoutIfNeeded()
+                self.updateImageScaleAndPosition()
+            case .failure: print("Error downloading image")
+            }
+            
+        }
+        
     }
     
     private func setupButtonBack() {
@@ -97,13 +104,11 @@ final class SingleImageViewController: UIViewController {
         
     }
     
-    private func updateImageScaleAndPosition() {
-        guard let image = imageView.image else { return }
-        
+    private func updateImageScaleAndPosition() {        
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
         let visibleRectSize = scrollView.bounds.size
-        let imageSize = image.size
+        let imageSize = imageView.frame.size
         
         guard !visibleRectSize.width.isZero, !visibleRectSize.height.isZero,
               !imageSize.width.isZero, !imageSize.height.isZero else {
@@ -152,5 +157,7 @@ extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return imageView
     }
+    
+    
 }
 

@@ -36,7 +36,8 @@ final class ProfileLogoutService {
     }
     private func navigateToInitialScreen() {
         guard let window = UIApplication.shared.windows.first else {
-            fatalError("Invalid Configuration")
+            assertionFailure("Invalid Configuration")
+            return
         }
         window.rootViewController = SplashViewController()
     }

@@ -10,7 +10,10 @@ import Kingfisher
 
 final class ImagesListViewController: UIViewController {
     
+    static let shared: ImagesListViewController = .init()
+    
     @IBOutlet private var tableView: UITableView!
+    
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private var photos: [Photo] = []
     private lazy var dateFormatter: DateFormatter = {
@@ -19,7 +22,11 @@ final class ImagesListViewController: UIViewController {
         formatter.timeStyle = .none
         return formatter
     }()
-    static let shared = ImagesListService.shared
+    lazy var iso8601DateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,11 +73,15 @@ final class ImagesListViewController: UIViewController {
     @objc private func updateTableViewAnimated() {
         let oldCount = photos.count
         let newPhotos = ImagesListService.shared.photos
-        let newCount = newPhotos.count
+        let uniqueNewPhotos = newPhotos.filter { newPhoto in
+            !photos.contains(where: { $0.id == newPhoto.id })
+        }
         
-        guard oldCount != newCount else { return }
-        
-        photos = newPhotos
+        guard !uniqueNewPhotos.isEmpty else { return }
+
+        let newCount = photos.count + uniqueNewPhotos.count
+        photos.append(contentsOf: uniqueNewPhotos)
+
         let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
         tableView.performBatchUpdates({
             tableView.insertRows(at: indexPaths, with: .automatic)
@@ -89,11 +100,13 @@ extension ImagesListViewController {
         )
         cell.delegate = self
         
-        let likeImage = image.isLiked ? UIImage(named: "like_active") : UIImage(
-            named: "like_no_active"
-        )
+        let likeImage = UIImage(named: image.isLiked ? "like_active" : "like_no_active")
         cell.likeButton.setImage(likeImage, for: .normal)
-        cell.dateLabel.text = dateFormatter.string(from: image.createdAt!)
+        if let createdAt = image.createdAt {
+            cell.dateLabel.text = dateFormatter.string(from: createdAt)
+        } else {
+            cell.dateLabel.text = image.welcomeDescription
+        }
     }
 }
 
@@ -154,16 +167,16 @@ extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = photos[indexPath.row]
+        let newLikeStatus = !photo.isLiked
+        
         UIBlockingProgressHUD.show()
-        ImagesListService.shared.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+        ImagesListService.shared.changeLike(photoId: photo.id, isLike: newLikeStatus) { [weak self] result in
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
-                guard let self = self else { return }
-                
                 switch result {
                 case .success:
-                    self.photos[indexPath.row].isLiked.toggle()
-                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    self?.photos[indexPath.row].isLiked = newLikeStatus
+                    self?.tableView.reloadRows(at: [indexPath], with: .automatic)
                 case .failure(let error):
                     print("Ошибка при изменении лайка: \(error.localizedDescription)")
                 }
