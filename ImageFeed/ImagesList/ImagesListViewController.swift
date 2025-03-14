@@ -171,12 +171,13 @@ extension ImagesListViewController: ImagesListCellDelegate {
         
         UIBlockingProgressHUD.show()
         ImagesListService.shared.changeLike(photoId: photo.id, isLike: newLikeStatus) { [weak self] result in
+            guard let self = self else { return }
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
                 switch result {
                 case .success:
-                    self?.photos[indexPath.row].isLiked = newLikeStatus
-                    self?.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    self.photos[indexPath.row].isLiked = newLikeStatus
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
                 case .failure(let error):
                     print("Ошибка при изменении лайка: \(error.localizedDescription)")
                 }

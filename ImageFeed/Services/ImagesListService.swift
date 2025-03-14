@@ -11,7 +11,7 @@ final class ImagesListService {
     
     static let shared = ImagesListService()
     private(set) var photos: [Photo] = []
-    
+    private let decoder = JSONDecoder()
     private var lastLoadedPage: Int?
     private var task: URLSessionTask?
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
@@ -52,8 +52,7 @@ final class ImagesListService {
                 }
 
                 do {
-                    let decoder = JSONDecoder()
-                    let newPhotosResult = try decoder.decode([PhotoResult].self, from: data)
+                    let newPhotosResult = try self.decoder.decode([PhotoResult].self, from: data)
                     let newPhotos = newPhotosResult.map { Photo(from: $0) }
                     self.photos.append(contentsOf: newPhotos)
                     self.lastLoadedPage = nextPage
