@@ -14,8 +14,7 @@ enum Constants {
     static let accessScope = "public+read_user+write_likes"
     static let defaultBaseURL: URL = {
         guard let url = URL(string: "https://api.unsplash.com") else {
-            assertionFailure("Invalid base URL: Unable to create URL from string")
-            return URL(string: "https://api.unsplash.com")!
+            preconditionFailure("Invalid base URL: Unable to create URL from string")
         }
         return url
     }()
