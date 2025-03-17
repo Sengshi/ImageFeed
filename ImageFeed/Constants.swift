@@ -8,13 +8,13 @@
 import Foundation
 
 enum Constants {
-    static let accessKey = "yH1wQXwwUb1gTTnCEC5inruIIJj5Rxfc6uqAuYmfzyk"
-    static let secretKey = "0fNc1lrqqq1QVq14KtqWJiG0hTM1--eZm9st_NA_kL0"
+    static let accessKey = "dXPRI4ppYtw1NyTEOVbFaBT2uYTegY1ENKsfaHtUQss"
+    static let secretKey = "HcjpD7T9tryJOcnjDOkgfVtjZ0YzWv5DArPiO0TAU6Y"
     static let redirectURI = "urn:ietf:wg:oauth:2.0:oob"
     static let accessScope = "public+read_user+write_likes"
     static let defaultBaseURL: URL = {
         guard let url = URL(string: "https://api.unsplash.com") else {
-            fatalError("Не удалось создать URL для baseURL")
+            preconditionFailure("Invalid base URL: Unable to create URL from string")
         }
         return url
     }()

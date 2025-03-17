@@ -12,12 +12,13 @@ final class ProfileViewController: UIViewController {
     
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
-    
     private var avatarImage: UIImageView = UIImageView()
     private var logoutButton: UIButton = UIButton(type: .custom)
     private var userNameLabel: UILabel = UILabel()
     private var loginNameLabel: UILabel = UILabel()
     private var descriptionLabel: UILabel = UILabel()
+    
+    private var gradientLayers: [CALayer] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,13 +29,13 @@ final class ProfileViewController: UIViewController {
         setupDescriptionLabel()
         setupLogoutButton()
         setupConstraints()
+        
         loadProfile()
     }
     
     // Setup Avatar Image
     private func setupAvatarImage() {
         avatarImage.image = UIImage(named: "placeholder")
-        avatarImage.contentMode = .scaleAspectFit
         avatarImage.layer.cornerRadius = avatarImage.frame.size.width / 2
         avatarImage.layer.masksToBounds = true
         avatarImage.translatesAutoresizingMaskIntoConstraints = false
@@ -110,10 +111,24 @@ final class ProfileViewController: UIViewController {
     }
     
     // Actions
+    // Обработка нажатия на кнопку выхода
     @objc private func didTapLogoutButton(_ sender: Any) {
-        // Обработка нажатия на кнопку выхода
-        print("Logout button tapped")
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены, что хотите выйти?",
+            preferredStyle: .alert
+        )
+        
+        let confirmAction = UIAlertAction(title: "Да", style: .default) { _ in
+            ProfileLogoutService.shared.logout()
+        }
+        let cancelAction = UIAlertAction(title: "Нет", style: .default, handler: nil)
+
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
+        present(alert, animated: true)
     }
+    
     
     private func loadProfile() {
         guard let token = OAuth2TokenStorage.shared.token else {
@@ -130,7 +145,6 @@ final class ProfileViewController: UIViewController {
                 print("Ошибка при загрузке профиля: \(error.localizedDescription)")
             }
         }
-        
     }
     
     private func fetchProfileImageURL(username: String) {
@@ -154,11 +168,11 @@ final class ProfileViewController: UIViewController {
             return
         }
         // Используем Kingfisher для загрузки изображения
-        let processor = RoundCornerImageProcessor(cornerRadius: 100)
+        let processor = RoundCornerImageProcessor(cornerRadius: avatarImage.frame.size.width / 2)
         avatarImage.kf.indicatorType = .activity
         avatarImage.kf.setImage(
             with: url,
-            placeholder: UIImage(named: "placeholder"), // Заглушка, пока изображение загружается
+            placeholder: UIImage(named: "placeholder"),
             options: [
                 .transition(.fade(0.5)),
                 .processor(processor)

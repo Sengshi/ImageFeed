@@ -10,7 +10,6 @@ import Foundation
 
 final class ProfileService {
     static let shared = ProfileService()
-    
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private var profile: Profile?
@@ -59,6 +58,12 @@ final class ProfileService {
         request.httpMethod = HTTPMethod.get.rawValue
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
+    }
+    
+    func cleanProfileData() {
+        profile = nil
+        task?.cancel()
+        task = nil
     }
     
 }

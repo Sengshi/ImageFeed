@@ -14,4 +14,5 @@ enum NetworkError: Error {
     case invalidRequest
     case noData
     case unauthorized
+    case invalidResponse
 }
