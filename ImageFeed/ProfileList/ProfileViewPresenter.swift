@@ -8,7 +8,7 @@
 import Foundation
 
 
-final class ProfilePresenter {
+final class ProfilePresenter: ProfilePresenterProtocol {
     var view: ProfileViewProtocol?
     
     private let profileService: ProfileService = ProfileService.shared
@@ -23,7 +23,7 @@ final class ProfilePresenter {
     func didTapLogout() {
         logoutService.logout()
     }
-    
+        
     private func loadProfile() {
         guard let token = tokenStorage.token else {
             view?.showError(message: "Ошибка: Токен отсутствует")
@@ -63,5 +63,9 @@ final class ProfilePresenter {
     }
 }
 
-
+protocol ProfilePresenterProtocol {
+    var view: ProfileViewProtocol? { get set }
+    func viewDidLoad()
+    func didTapLogout()
+}
 

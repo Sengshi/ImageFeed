@@ -10,18 +10,15 @@ import Kingfisher
 
 final class ProfileViewController: UIViewController & ProfileViewProtocol {
     
-    
-    var presenter: ProfilePresenter?
-    
     private let avatarImage = UIImageView()
     private let logoutButton = UIButton(type: .custom)
     private let userNameLabel = UILabel()
     private let loginNameLabel = UILabel()
     private let descriptionLabel = UILabel()
-    
+    var presenter: ProfilePresenterProtocol? = ProfilePresenter()
+        
     override func viewDidLoad() {
         super.viewDidLoad()
-        presenter = ProfilePresenter()
         presenter?.view = self
         presenter?.viewDidLoad()
         setupUI()
@@ -95,20 +92,8 @@ final class ProfileViewController: UIViewController & ProfileViewProtocol {
         ])
     }
     
-    @objc private func didTapLogoutButton(_ sender: Any) {
-        let alert = UIAlertController(
-            title: "Пока, пока!",
-            message: "Уверены, что хотите выйти?",
-            preferredStyle: .alert
-        )
-        let confirmAction = UIAlertAction(title: "Да", style: .default) { _ in
-            self.presenter?.didTapLogout()
-        }
-        let cancelAction = UIAlertAction(title: "Нет", style: .default, handler: nil)
-        
-        alert.addAction(confirmAction)
-        alert.addAction(cancelAction)
-        present(alert, animated: true)
+    @objc func didTapLogoutButton(_ sender: Any) {
+        showLogoutConfirmation()
     }
     
     func updateProfile(profile: Profile) {
@@ -134,6 +119,22 @@ final class ProfileViewController: UIViewController & ProfileViewProtocol {
     func showError(message: String) {
         let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func showLogoutConfirmation() {
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены, что хотите выйти?",
+            preferredStyle: .alert
+        )
+        let confirmAction = UIAlertAction(title: "Да", style: .default) { _ in
+            self.presenter?.didTapLogout()
+        }
+        let cancelAction = UIAlertAction(title: "Нет", style: .default, handler: nil)
+        
+        alert.addAction(confirmAction)
+        alert.addAction(cancelAction)
         present(alert, animated: true)
     }
     
