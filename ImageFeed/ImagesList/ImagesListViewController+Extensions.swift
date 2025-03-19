@@ -9,7 +9,7 @@ import UIKit
 
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        let image = photos[indexPath.row]
+        let image = presenter.photos[indexPath.row]
         
         cell.cellImage.kf.indicatorType = .activity
         cell.cellImage.kf.setImage(
@@ -30,9 +30,9 @@ extension ImagesListViewController {
 
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return photos.count
-        
+        return presenter.photos.count
     }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(
             withIdentifier: ImagesListCell.reuseIdentifier,
@@ -47,12 +47,11 @@ extension ImagesListViewController: UITableViewDataSource {
         
         return imageListCell
     }
-    
 }
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let photo = photos[indexPath.row]
+        let photo = presenter.photos[indexPath.row]
         performSegue(
             withIdentifier: showSingleImageSegueIdentifier,
             sender: photo
@@ -60,7 +59,7 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let image = photos[indexPath.row]
+        let image = presenter.photos[indexPath.row]
         guard URL(string: image.largeImageURL) != nil else {
             return 0
         }
@@ -74,30 +73,26 @@ extension ImagesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == photos.count - 1 {
-            ImagesListService.shared.fetchPhotosNextPage { _ in }
+        if indexPath.row == presenter.photos.count - 1 {
+            presenter.fetchPhotos()
         }
     }
-    
 }
 
 extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let photo = photos[indexPath.row]
-        let newLikeStatus = !photo.isLiked
+        let photo = presenter.photos[indexPath.row]
+        _ = !photo.isLiked
         
         UIBlockingProgressHUD.show()
-        ImagesListService.shared.changeLike(photoId: photo.id, isLike: newLikeStatus) { [weak self] result in
-            guard let self = self else { return }
+        presenter.likePhoto(at: indexPath.row) { success in
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
-                switch result {
-                case .success:
-                    self.photos[indexPath.row].isLiked = newLikeStatus
+                if success {
                     self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                case .failure(let error):
-                    print("Ошибка при изменении лайка: \(error.localizedDescription)")
+                } else {
+                    print("Ошибка при изменении лайка")
                 }
             }
         }

@@ -112,6 +112,7 @@ final class ProfileViewTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
+        
         presenterSpy = ProfilePresenterSpy()
         viewSpy = ProfileViewControllerSpy()
         profileViewController = ProfileViewController()
@@ -127,23 +128,27 @@ final class ProfileViewTests: XCTestCase {
         super.tearDown()
     }
     
-    func testViewDidLoad_CallsPresenterViewDidLoad() {
-        // When
+    func testPresenterViewDidLoad() {
+        // Given
+        
+       // When
         profileViewController.viewDidLoad()
         
         // Then
         XCTAssertTrue(presenterSpy.viewDidLoadCalled)
     }
     
-    func testDidTapLogout_CallsPresenterDidTapLogout() {
+    func testPresenterDidTapLogout() {
+        // Given
+        
         // When
         presenterSpy.didTapLogout()
-
+        
         // Then
         XCTAssertTrue(presenterSpy.showLogoutConfirmationCalled)
     }
     
-    func testUpdateProfile_UpdatesViewCorrectly() {
+    func testProfileUpdatesViewCorrectly() {
         // Given
         let profileResult = ProfileResult(username: "johndoe", firstName: "John", lastName: "Doe", bio: "Test bio")
         let profile = Profile(profileResult: profileResult)
@@ -158,7 +163,7 @@ final class ProfileViewTests: XCTestCase {
         XCTAssertEqual(viewSpy.receivedProfile?.bio, "Test bio")
     }
     
-    func testUpdateAvatar_UpdatesViewCorrectly() {
+    func testUpdateAvatar() {
         // Given
         let avatarURL = "https://example.com/avatar.jpg"
         
@@ -183,3 +188,85 @@ final class ProfileViewTests: XCTestCase {
     }
 }
 
+final class ImagesListViewControllerTests: XCTestCase {
+    private var presenterSpy: ImagesListPresenterSpy!
+    private var viewController: ImagesListViewController!
+    
+    override func setUp() {
+        super.setUp()
+        let window = UIWindow()
+
+        presenterSpy = ImagesListPresenterSpy()
+        viewController = ImagesListViewController()
+        viewController.presenter = presenterSpy
+        viewController.tableView = UITableView()
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+
+        _ = viewController.view
+
+    }
+    
+    override func tearDown() {
+        presenterSpy = nil
+        viewController = nil
+        super.tearDown()
+    }
+    
+    func testViewDidLoad_CallsAttachView() {
+        // Given
+
+        // When
+        viewController.viewDidLoad()
+        
+        // Then
+        XCTAssertTrue(presenterSpy.attachViewCalled)
+    }
+    
+    func testShowError_PresentsAlert() {
+        // Given
+        let errorMessage = "Ошибка загрузки"
+        
+        // When
+        viewController.showError(errorMessage)
+        
+        // Then
+        XCTAssertNotNil(viewController.presentedViewController as? UIAlertController)
+        XCTAssertEqual((viewController.presentedViewController as? UIAlertController)?.message, errorMessage)
+    }
+    
+    func testUpdateTableView_ReloadsTableView() {
+        // Given
+        let tableViewSpy = UITableViewSpy()
+        viewController.tableView = tableViewSpy
+        
+        // When
+        viewController.updateTableView()
+        
+        // Then
+        XCTAssertTrue(tableViewSpy.reloadDataCalled)
+    }
+    
+    func testFetchPhotos_CallsFetchPhotos() {
+        // Given
+        
+        // When
+        presenterSpy.fetchPhotos()
+        
+        // Then
+        XCTAssertTrue(presenterSpy.fetchPhotosCalled)
+    }
+    
+    func testLikePhoto_CallsLikePhoto() {
+        // Given
+        let index = 0
+        
+        // When
+        presenterSpy.likePhoto(at: index) { success in
+            // Then
+            XCTAssertTrue(self.presenterSpy.likePhotoCalled)
+            XCTAssertTrue(success)
+        }
+    }
+
+}

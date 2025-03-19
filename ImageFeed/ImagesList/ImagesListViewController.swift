@@ -8,55 +8,44 @@
 import UIKit
 import Kingfisher
 
-final class ImagesListViewController: UIViewController {
-    
-    static let shared: ImagesListViewController = .init()
-    
+final class ImagesListViewController: UIViewController & ImagesListViewProtocol {
     @IBOutlet var tableView: UITableView!
-    
+
+    var presenter: ImagesListPresenterProtocol = ImagesListPresenter()
     let showSingleImageSegueIdentifier = "ShowSingleImage"
-    var photos: [Photo] = []
+    
     lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
         formatter.timeStyle = .none
         return formatter
     }()
+
     lazy var iso8601DateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         return formatter
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.rowHeight = 200 // Устанавливаем высоту ячейки
-        tableView.contentInset = UIEdgeInsets(
-            top: 12,
-            left: 0,
-            bottom: 12,
-            right: 0
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(updateTableViewAnimated),
-            name: ImagesListService.didChangeNotification,
-            object: nil
-        )
-        
-        ImagesListService.shared.fetchPhotosNextPage(){ [weak self] result in
-            guard self != nil else { return }
-            
-            switch result {
-            case .success:
-                break
-            case .failure(let error):
-                print("Ошибка при загрузке фотографий: \(error.localizedDescription)")
-            }
-        }
-        
+
+        tableView.rowHeight = 200
+        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        presenter.attachView(self)
+
     }
-    
+
+    func updateTableView() {
+        tableView.reloadData()
+    }
+
+    func showError(_ message: String) {
+        let alert = UIAlertController(title: "Ошибка", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard
             segue.identifier == showSingleImageSegueIdentifier,
@@ -69,23 +58,4 @@ final class ImagesListViewController: UIViewController {
         
         viewController.imageURL = URL(string: photo.largeImageURL)
     }
-    
-    @objc private func updateTableViewAnimated() {
-        let oldCount = photos.count
-        let newPhotos = ImagesListService.shared.photos
-        let uniqueNewPhotos = newPhotos.filter { newPhoto in
-            !photos.contains(where: { $0.id == newPhoto.id })
-        }
-        
-        guard !uniqueNewPhotos.isEmpty else { return }
-
-        let newCount = photos.count + uniqueNewPhotos.count
-        photos.append(contentsOf: uniqueNewPhotos)
-
-        let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
-        tableView.performBatchUpdates({
-            tableView.insertRows(at: indexPaths, with: .automatic)
-        }, completion: nil)
-    }
 }
-
