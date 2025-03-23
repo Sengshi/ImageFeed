@@ -13,13 +13,13 @@ final class ImagesListService {
     private(set) var photos: [Photo] = []
     private let decoder = JSONDecoder()
     private var lastLoadedPage: Int?
-    private var currentTask: URLSessionTask? // Переименовали task в currentTask
+    private var currentTask: URLSessionTask?
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     
     private init() {}
     
     func fetchPhotosNextPage(_ completion: @escaping (Result<String, Error>) -> Void) {
-        guard currentTask == nil else { return } // Используем currentTask
+        guard currentTask == nil else { return }
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("Ошибка: Токен отсутствует")
@@ -37,7 +37,7 @@ final class ImagesListService {
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                self.currentTask = nil // Используем currentTask
+                self.currentTask = nil
 
                 if let error = error {
                     print("[ImagesListService]: Ошибка при изменении лайка - \(error.localizedDescription)")
@@ -82,10 +82,11 @@ final class ImagesListService {
     }
     
     func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
-        guard currentTask == nil else { return } // Используем currentTask
+        guard currentTask == nil else { return }
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("Ошибка: Токен отсутствует")
+            completion(.failure(NetworkError.unauthorized))
             return
         }
         
@@ -98,7 +99,7 @@ final class ImagesListService {
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                self.currentTask = nil // Используем currentTask
+                self.currentTask = nil
                 
                 if let error = error {
                     print("[ImagesListService]: Ошибка при изменении лайка - \(error.localizedDescription)")
@@ -122,7 +123,7 @@ final class ImagesListService {
             }
         }
         
-        self.currentTask = task // Используем currentTask
+        self.currentTask = task 
         task.resume()
     }
     

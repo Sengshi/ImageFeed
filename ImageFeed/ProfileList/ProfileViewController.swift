@@ -46,12 +46,14 @@ final class ProfileViewController: UIViewController & ProfileViewProtocol {
     private func setupUserNameLabel() {
         setupLabel(userNameLabel, font: .systemFont(ofSize: 23, weight: .bold), textColor: .white)
         userNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        userNameLabel.accessibilityIdentifier = "userNameLabel"
         view.addSubview(userNameLabel)
     }
     
     private func setupLoginNameLabel() {
         setupLabel(loginNameLabel, font: .systemFont(ofSize: 13, weight: .regular), textColor: UIColor(red: 174, green: 175, blue: 180, alpha: 1))
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        loginNameLabel.accessibilityIdentifier = "loginNameLabel"
         view.addSubview(loginNameLabel)
     }
     
@@ -66,6 +68,7 @@ final class ProfileViewController: UIViewController & ProfileViewProtocol {
         logoutButton.setImage(UIImage(named: "logout_button"), for: .normal)
         logoutButton.addTarget(self, action: #selector(didTapLogoutButton(_:)), for: .touchUpInside)
         logoutButton.translatesAutoresizingMaskIntoConstraints = false
+        logoutButton.accessibilityIdentifier = "logoutButton"
         view.addSubview(logoutButton)
     }
     

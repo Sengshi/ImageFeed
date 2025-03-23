@@ -28,7 +28,7 @@ extension ImagesListViewController {
     }
 }
 
-extension ImagesListViewController: UITableViewDataSource {
+extension ImagesListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return presenter.photos.count
     }
@@ -47,9 +47,7 @@ extension ImagesListViewController: UITableViewDataSource {
         
         return imageListCell
     }
-}
-
-extension ImagesListViewController: UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let photo = presenter.photos[indexPath.row]
         performSegue(
@@ -83,13 +81,14 @@ extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let photo = presenter.photos[indexPath.row]
-        _ = !photo.isLiked
+        let newLikeStatus = !photo.isLiked
         
         UIBlockingProgressHUD.show()
         presenter.likePhoto(at: indexPath.row) { success in
             DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
                 if success {
+                    self.presenter.photos[indexPath.row].isLiked = newLikeStatus
                     self.tableView.reloadRows(at: [indexPath], with: .automatic)
                 } else {
                     print("Ошибка при изменении лайка")

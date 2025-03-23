@@ -11,7 +11,7 @@ final class ImagesListCell: UITableViewCell {
     static let reuseIdentifier = "ImagesListCell"
     private var gradientLayer: CAGradientLayer?
     weak var delegate: ImagesListCellDelegate?
-
+    
     @IBOutlet var cellImage: UIImageView!
     @IBOutlet var gradientView: UIView!
     @IBOutlet var dateLabel: UILabel!
@@ -26,6 +26,8 @@ final class ImagesListCell: UITableViewCell {
         super.awakeFromNib()
         setupCornerRadius()
         setupGradient()
+        likeButton.accessibilityIdentifier = "ButtonLike"
+        likeButton.isUserInteractionEnabled = true
     }
     
     override func layoutSubviews() {
