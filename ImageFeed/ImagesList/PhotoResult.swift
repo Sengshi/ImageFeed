@@ -41,9 +41,15 @@ struct Photo {
     let largeImageURL: String
     var isLiked: Bool
     
+    private static let dateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+    
     init(from photoResult: PhotoResult) {
         self.id = photoResult.id
-        self.createdAt = ISO8601DateFormatter().date(from: photoResult.createdAt ?? "")
+        self.createdAt = Photo.dateFormatter.date(from: photoResult.createdAt ?? "")
         self.width = photoResult.width
         self.height = photoResult.height
         self.welcomeDescription = photoResult.welcomeDescription

@@ -11,7 +11,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     var photos: [Photo] = []
     
     weak var view: ImagesListViewProtocol?
-
+    
     let imagesService = ImagesListService.shared
     func attachView(_ view: ImagesListViewProtocol) {
         self.view = view
@@ -23,7 +23,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         )
         fetchPhotos()
     }
-
+    
     func fetchPhotos() {
         imagesService.fetchPhotosNextPage { [weak self] result in
             guard let self = self else { return }
@@ -37,7 +37,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
             }
         }
     }
-
+    
     @objc private func didUpdatePhotos() {
         let newPhotos = imagesService.photos
         let uniqueNewPhotos = newPhotos.filter { newPhoto in
@@ -48,24 +48,22 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         photos.append(contentsOf: uniqueNewPhotos)
         view?.updateTableView()
     }
-
+    
     func getPhoto(at index: Int) -> Photo {
         return photos[index]
     }
-
+    
     func numberOfPhotos() -> Int {
         return photos.count
     }
-
+    
     func likePhoto(at index: Int, completion: @escaping (Bool) -> Void) {
         let photo = photos[index]
         let newLikeStatus = !photo.isLiked
-
-        UIBlockingProgressHUD.show()
+        
         imagesService.changeLike(photoId: photo.id, isLike: newLikeStatus) { [weak self] result in
             guard let self = self else { return }
             DispatchQueue.main.async {
-                UIBlockingProgressHUD.dismiss()
                 switch result {
                 case .success:
                     self.photos[index].isLiked = newLikeStatus

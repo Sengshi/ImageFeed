@@ -13,7 +13,7 @@ final class SplashViewController: UIViewController {
     private let storage = OAuth2TokenStorage.shared
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private var logoImage : UIImageView! = UIImageView()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 26, green: 27, blue: 34, alpha: 1)
@@ -22,7 +22,7 @@ final class SplashViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        
         if storage.token != nil {
             fetchProfile(token: storage.token!)
         } else {
@@ -45,10 +45,10 @@ final class SplashViewController: UIViewController {
             assertionFailure("Не удалось получить window")
             return
         }
-
+        
         let tabBarController = UIStoryboard(name: "Main", bundle: .main)
             .instantiateViewController(withIdentifier: "TabBarViewController")
-
+        
         window.rootViewController = tabBarController
     }
     
@@ -63,14 +63,14 @@ final class SplashViewController: UIViewController {
     private func fetchProfile(token: String) {
         UIBlockingProgressHUD.show() // Показываем индикатор загрузки
         profileService.fetchProfile(token) { [weak self] result in
-            UIBlockingProgressHUD.dismiss() // Скрываем индикатор загрузки
-
+            
             guard let self = self else { return }
-
+            
             switch result {
             case .success (let profile):
                 profileImageService.fetchProfileImageURL(username: profile.username) { _ in }
                 // Если профиль успешно загружен, переходим к TabBarController
+                UIBlockingProgressHUD.dismiss()
                 self.switchToTabBarController()
             case .failure(let error):
                 // Если произошла ошибка, показываем сообщение об ошибке
@@ -88,7 +88,7 @@ final class SplashViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-
+    
 }
 
 extension SplashViewController: AuthViewControllerDelegate {
@@ -112,7 +112,7 @@ extension SplashViewController {
                 assertionFailure("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")
                 return
             }
-
+            
             viewController.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)

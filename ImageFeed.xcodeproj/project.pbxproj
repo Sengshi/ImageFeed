@@ -10,17 +10,18 @@
 		2D1F93262D7889F400BE0367 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 2D1F93252D7889F400BE0367 /* SwiftKeychainWrapper */; };
 		2DA4C1B52D77B889004124CD /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 2DA4C1B42D77B889004124CD /* ProgressHUD */; };
 		2DA4C1C02D78374F004124CD /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 2DA4C1BF2D78374F004124CD /* Kingfisher */; };
+		2DEC02982D922A0900C0F602 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 2DEC02972D922A0900C0F602 /* ProgressHUD */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		2D8141952D8B7D6B00595460 /* PBXContainerItemProxy */ = {
+		2DB6A38B2D882B7B00D310C2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2D808E9C2D503F3600548130 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 2D808EA32D503F3600548130;
 			remoteInfo = ImageFeed;
 		};
-		2DB6A38B2D882B7B00D310C2 /* PBXContainerItemProxy */ = {
+		2DEC02942D922A0100C0F602 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2D808E9C2D503F3600548130 /* Project object */;
 			proxyType = 1;
@@ -36,6 +37,34 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2D728F222D9192F60041A9F9 /* Exceptions for "ImageFeed" folder in "ImageFeedTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Addons/AccessibilityIdentifiers.swift,
+				Addons/UIBlockingProgressHUD.swift,
+				Auth/AuthHelper.swift,
+				Auth/WebViewPresenter.swift,
+				Auth/WebViewPresenterProtocol.swift,
+				Auth/WebViewViewController.swift,
+				Auth/WebViewViewControllerProtocol.swift,
+				AuthConfiguration.swift,
+			);
+			target = 2DB6A3862D882B7B00D310C2 /* ImageFeedTests */;
+		};
+		2D728F4A2D919BD30041A9F9 /* Exceptions for "ImageFeed" folder in "ImageFeedUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Addons/AccessibilityIdentifiers.swift,
+				Addons/UIBlockingProgressHUD.swift,
+				Auth/AuthHelper.swift,
+				Auth/WebViewPresenter.swift,
+				Auth/WebViewPresenterProtocol.swift,
+				Auth/WebViewViewController.swift,
+				Auth/WebViewViewControllerProtocol.swift,
+				AuthConfiguration.swift,
+			);
+			target = 2D81418E2D8B7D6B00595460 /* ImageFeedUITests */;
+		};
 		2D808EB62D503F3700548130 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -50,6 +79,8 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2D808EB62D503F3700548130 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */,
+				2D728F222D9192F60041A9F9 /* Exceptions for "ImageFeed" folder in "ImageFeedTests" target */,
+				2D728F4A2D919BD30041A9F9 /* Exceptions for "ImageFeed" folder in "ImageFeedUITests" target */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
@@ -81,6 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2DEC02982D922A0900C0F602 /* ProgressHUD in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +132,7 @@
 				2D808EA62D503F3600548130 /* ImageFeed */,
 				2DB6A3882D882B7B00D310C2 /* ImageFeedTests */,
 				2D8141902D8B7D6B00595460 /* ImageFeedUITests */,
+				2DEC02962D922A0900C0F602 /* Frameworks */,
 				2D808EA52D503F3600548130 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +145,13 @@
 				2D81418F2D8B7D6B00595460 /* ImageFeedUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2DEC02962D922A0900C0F602 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -153,13 +193,14 @@
 			buildRules = (
 			);
 			dependencies = (
-				2D8141962D8B7D6B00595460 /* PBXTargetDependency */,
+				2DEC02952D922A0100C0F602 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				2D8141902D8B7D6B00595460 /* ImageFeedUITests */,
 			);
 			name = ImageFeedUITests;
 			packageProductDependencies = (
+				2DEC02972D922A0900C0F602 /* ProgressHUD */,
 			);
 			productName = ImageFeedUITests;
 			productReference = 2D81418F2D8B7D6B00595460 /* ImageFeedUITests.xctest */;
@@ -286,15 +327,15 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		2D8141962D8B7D6B00595460 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 2D808EA32D503F3600548130 /* ImageFeed */;
-			targetProxy = 2D8141952D8B7D6B00595460 /* PBXContainerItemProxy */;
-		};
 		2DB6A38C2D882B7B00D310C2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 2D808EA32D503F3600548130 /* ImageFeed */;
 			targetProxy = 2DB6A38B2D882B7B00D310C2 /* PBXContainerItemProxy */;
+		};
+		2DEC02952D922A0100C0F602 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2D808EA32D503F3600548130 /* ImageFeed */;
+			targetProxy = 2DEC02942D922A0100C0F602 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -639,6 +680,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2DA4C1BE2D78374F004124CD /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		2DEC02972D922A0900C0F602 /* ProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2DA4C1B32D77B889004124CD /* XCRemoteSwiftPackageReference "ProgressHUD" */;
+			productName = ProgressHUD;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

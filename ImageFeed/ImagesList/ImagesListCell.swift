@@ -26,8 +26,7 @@ final class ImagesListCell: UITableViewCell {
         super.awakeFromNib()
         setupCornerRadius()
         setupGradient()
-        likeButton.accessibilityIdentifier = "ButtonLike"
-        likeButton.isUserInteractionEnabled = true
+        setupLikeButton()
     }
     
     override func layoutSubviews() {
@@ -59,6 +58,7 @@ final class ImagesListCell: UITableViewCell {
         gradientLayer.locations = [0.0, 1.0]
         gradientLayer.frame = gradientView.bounds
         
+        
         // Создаем маску с скругленными нижними углами
         let maskPath = UIBezierPath(
             roundedRect: gradientView.bounds,
@@ -72,9 +72,16 @@ final class ImagesListCell: UITableViewCell {
         
         // Добавляем градиент на gradientView
         gradientView.layer.insertSublayer(gradientLayer, at: 0)
+        gradientView.isUserInteractionEnabled = false
+        gradientView.bringSubviewToFront(likeButton)
         
         // Сохраняем ссылку на gradientLayer
         self.gradientLayer = gradientLayer
+    }
+    
+    private func setupLikeButton() {
+        likeButton.isUserInteractionEnabled = true
+        likeButton.accessibilityIdentifier = AccessibilityIdentifiers.Feed.likeButton
     }
     
     

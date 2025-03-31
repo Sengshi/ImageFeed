@@ -30,7 +30,6 @@ final class SingleImageViewController: UIViewController {
     
     // Приватные методы
     private func setupScrollView() {
-        scrollView.accessibilityIdentifier = "ImageScrollView"
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
         scrollView.delegate = self
@@ -72,7 +71,7 @@ final class SingleImageViewController: UIViewController {
     }
     
     private func setupButtonBack() {
-        buttonBack.accessibilityIdentifier = "navBackButton"
+        buttonBack.accessibilityIdentifier = AccessibilityIdentifiers.Feed.backButton
         buttonBack.setImage(UIImage(named: "to_back"), for: .normal)
         buttonBack.addTarget(self, action: #selector(didTapButtonBack(_:)), for: .touchUpInside)
         buttonBack.translatesAutoresizingMaskIntoConstraints = false

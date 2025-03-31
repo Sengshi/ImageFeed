@@ -38,19 +38,19 @@ final class ImagesListService {
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 self.currentTask = nil
-
+                
                 if let error = error {
                     print("[ImagesListService]: Ошибка при изменении лайка - \(error.localizedDescription)")
                     completion(.failure(error))
                     return
                 }
-
+                
                 guard let data = data else {
                     print("[ImagesListService]: Нет данных для обработки")
                     completion(.failure(NetworkError.invalidResponse))
                     return
                 }
-
+                
                 do {
                     let newPhotosResult = try self.decoder.decode([PhotoResult].self, from: data)
                     let newPhotos = newPhotosResult.map { Photo(from: $0) }
@@ -82,7 +82,6 @@ final class ImagesListService {
     }
     
     func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
-        guard currentTask == nil else { return }
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("Ошибка: Токен отсутствует")
