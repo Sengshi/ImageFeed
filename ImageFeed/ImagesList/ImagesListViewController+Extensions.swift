@@ -18,9 +18,7 @@ extension ImagesListViewController {
         )
         cell.delegate = self
         
-        let likeImage = UIImage(named: image.isLiked ? "like_active" : "like_no_active")
-        cell.likeButton.setImage(likeImage, for: .normal)
-        cell.likeButton.accessibilityIdentifier = image.isLiked ? AccessibilityIdentifiers.Feed.unLikeButton : AccessibilityIdentifiers.Feed.likeButton
+        cell.setIsLiked(image.isLiked)
         if let createdAt = image.createdAt {
             cell.dateLabel.text = ImagesListViewController.dateFormatter.string(from: createdAt)
         } else {
@@ -90,9 +88,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
                 UIBlockingProgressHUD.dismiss()
                 if success {
                     self.presenter.photos[indexPath.row].isLiked = newLikeStatus
-                    let likeImage = UIImage(named: newLikeStatus ? "like_active" : "like_no_active")
-                    cell.likeButton.setImage(likeImage, for: .normal)
-                    cell.likeButton.accessibilityIdentifier = newLikeStatus ? AccessibilityIdentifiers.Feed.unLikeButton : AccessibilityIdentifiers.Feed.likeButton
+                    cell.setIsLiked(newLikeStatus)
                     self.tableView.reloadRows(at: [indexPath], with: .automatic)
                 } else {
                     print("Ошибка при изменении лайка")

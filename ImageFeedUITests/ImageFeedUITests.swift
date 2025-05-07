@@ -55,59 +55,59 @@ final class ImageFeedUITests: XCTestCase {
     
     func testFeed() throws {
         let tablesQuery = app.tables
+        sleep(3)
+
         let firstCell = tablesQuery.cells.element(boundBy: 0)
-        sleep(10)
-        let likeButton = firstCell.buttons[AccessibilityIdentifiers.Feed.likeButton]
-        
-        likeButton.tap()
-        sleep(10)
-        let unLikeButton = firstCell.buttons[AccessibilityIdentifiers.Feed.unLikeButton]
-        unLikeButton.tap()
-        sleep(10)
         firstCell.swipeUp()
+        sleep(3)
+
+        let cellToLike = tablesQuery.cells.element(boundBy: 1)
+        let likeButton = cellToLike.buttons[AccessibilityIdentifiers.Feed.likeButton]
+        sleep(2)
+        likeButton.tap()
         sleep(5)
-        firstCell.swipeDown()
+
+        let unLikeButton = cellToLike.buttons[AccessibilityIdentifiers.Feed.unLikeButton]
+        sleep(2)
+        unLikeButton.tap()
         sleep(5)
-        let cellToImage = tablesQuery.cells.element(boundBy: 0)
-        cellToImage.tap()
-        sleep(10)
+
+        cellToLike.tap()
+        sleep(5)
+
         let image = app.scrollViews.images.element(boundBy: 0)
-        
         image.pinch(withScale: 3, velocity: 1)
         sleep(10)
-        
         image.pinch(withScale: 0.5, velocity: -1)
         sleep(10)
-        
+
         let backButton = app.buttons[AccessibilityIdentifiers.Feed.backButton]
         backButton.tap()
-        
     }
+
     
     func testProfile() throws {
         let profileTab = app.tabBars.buttons.element(boundBy: 1)
         XCTAssertTrue(profileTab.waitForExistence(timeout: 5))
         profileTab.tap()
-        
+
         let userNameLabel = app.staticTexts[AccessibilityIdentifiers.Profile.userNameLabel]
         XCTAssertTrue(userNameLabel.waitForExistence(timeout: 5))
-        
+
         let loginNameLabel = app.staticTexts[AccessibilityIdentifiers.Profile.loginNameLabel]
         XCTAssertTrue(loginNameLabel.waitForExistence(timeout: 5))
-        
+
         let logoutButton = app.buttons[AccessibilityIdentifiers.Profile.logoutButton]
         XCTAssertTrue(logoutButton.waitForExistence(timeout: 5))
         logoutButton.tap()
-        
+
         let alert = app.alerts["Пока, пока!"]
         XCTAssertTrue(alert.waitForExistence(timeout: 5))
         alert.scrollViews.otherElements.buttons["Да"].tap()
+        
+        let authButton = app.buttons["Authenticate"]
+        XCTAssertTrue(authButton.waitForExistence(timeout: 10))
     }
+
     
-    private func scrollToElementIfNeeded(_ element: XCUIElement, in table: XCUIElement) {
-        while !element.isHittable {
-            table.swipeDown()
-            sleep(2)
-        }
-    }
 }

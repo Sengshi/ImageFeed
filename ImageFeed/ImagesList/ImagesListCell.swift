@@ -26,7 +26,6 @@ final class ImagesListCell: UITableViewCell {
         super.awakeFromNib()
         setupCornerRadius()
         setupGradient()
-        setupLikeButton()
     }
     
     override func layoutSubviews() {
@@ -79,11 +78,14 @@ final class ImagesListCell: UITableViewCell {
         self.gradientLayer = gradientLayer
     }
     
-    private func setupLikeButton() {
-        likeButton.isUserInteractionEnabled = true
-        likeButton.accessibilityIdentifier = AccessibilityIdentifiers.Feed.likeButton
+    func setIsLiked(_ isLiked: Bool) {
+        let imageName = isLiked ? "like_active" : "like_no_active"
+        likeButton.setImage(UIImage(named: imageName), for: .normal)
+
+        likeButton.accessibilityIdentifier = isLiked
+            ? AccessibilityIdentifiers.Feed.unLikeButton
+            : AccessibilityIdentifiers.Feed.likeButton
     }
-    
     
 }
 
