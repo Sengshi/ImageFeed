@@ -82,6 +82,7 @@ extension ImagesListViewController: ImagesListCellDelegate {
         let photo = presenter.photos[indexPath.row]
         let newLikeStatus = !photo.isLiked
         
+        
         UIBlockingProgressHUD.show()
         presenter.likePhoto(at: indexPath.row) { success in
             DispatchQueue.main.async {
