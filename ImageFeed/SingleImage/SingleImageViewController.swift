@@ -27,7 +27,7 @@ final class SingleImageViewController: UIViewController {
         setupButtonShare()
         setupConstraints()
     }
-
+    
     // Приватные методы
     private func setupScrollView() {
         scrollView.minimumZoomScale = 0.1
@@ -43,6 +43,8 @@ final class SingleImageViewController: UIViewController {
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(imageView)
+        scrollView.isUserInteractionEnabled = true
+        
         UIBlockingProgressHUD.show()
         
         guard let url = imageURL else {
@@ -69,6 +71,7 @@ final class SingleImageViewController: UIViewController {
     }
     
     private func setupButtonBack() {
+        buttonBack.accessibilityIdentifier = AccessibilityIdentifiers.Feed.backButton
         buttonBack.setImage(UIImage(named: "to_back"), for: .normal)
         buttonBack.addTarget(self, action: #selector(didTapButtonBack(_:)), for: .touchUpInside)
         buttonBack.translatesAutoresizingMaskIntoConstraints = false

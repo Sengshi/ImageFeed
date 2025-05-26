@@ -11,7 +11,7 @@ final class ImagesListCell: UITableViewCell {
     static let reuseIdentifier = "ImagesListCell"
     private var gradientLayer: CAGradientLayer?
     weak var delegate: ImagesListCellDelegate?
-
+    
     @IBOutlet var cellImage: UIImageView!
     @IBOutlet var gradientView: UIView!
     @IBOutlet var dateLabel: UILabel!
@@ -57,6 +57,7 @@ final class ImagesListCell: UITableViewCell {
         gradientLayer.locations = [0.0, 1.0]
         gradientLayer.frame = gradientView.bounds
         
+        
         // Создаем маску с скругленными нижними углами
         let maskPath = UIBezierPath(
             roundedRect: gradientView.bounds,
@@ -70,11 +71,21 @@ final class ImagesListCell: UITableViewCell {
         
         // Добавляем градиент на gradientView
         gradientView.layer.insertSublayer(gradientLayer, at: 0)
+        gradientView.isUserInteractionEnabled = false
+        gradientView.bringSubviewToFront(likeButton)
         
         // Сохраняем ссылку на gradientLayer
         self.gradientLayer = gradientLayer
     }
     
+    func setIsLiked(_ isLiked: Bool) {
+        let imageName = isLiked ? "like_active" : "like_no_active"
+        likeButton.setImage(UIImage(named: imageName), for: .normal)
+
+        likeButton.accessibilityIdentifier = isLiked
+            ? AccessibilityIdentifiers.Feed.unLikeButton
+            : AccessibilityIdentifiers.Feed.likeButton
+    }
     
 }
 

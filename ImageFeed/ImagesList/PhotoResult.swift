@@ -31,32 +31,30 @@ struct PhotoResult: Decodable {
     }
 }
 
-struct Photo: Decodable {
+struct Photo {
     let id: String
     let createdAt: Date?
     let width: Int
     let height: Int
-    var isLiked: Bool
+    let welcomeDescription: String?
     let thumbImageURL: String
     let largeImageURL: String
-    let welcomeDescription: String?
+    var isLiked: Bool
     
-    init(from result: PhotoResult) {
-        self.id = result.id
-        self.width = result.width
-        self.height = result.height
-        self.isLiked = result.isLiked
-        self.thumbImageURL = result.urls.small
-        self.largeImageURL = result.urls.full
-        if let createdAtString = result.createdAt {
-            self.createdAt = ImagesListViewController.shared.iso8601DateFormatter.date(from: createdAtString)
-        } else {
-            self.createdAt = nil
-        }
-        self.welcomeDescription = result.welcomeDescription
+    private static let dateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+    
+    init(from photoResult: PhotoResult) {
+        self.id = photoResult.id
+        self.createdAt = Photo.dateFormatter.date(from: photoResult.createdAt ?? "")
+        self.width = photoResult.width
+        self.height = photoResult.height
+        self.welcomeDescription = photoResult.welcomeDescription
+        self.thumbImageURL = photoResult.urls.small
+        self.largeImageURL = photoResult.urls.full
+        self.isLiked = photoResult.isLiked
     }
-    
-    
 }
-
-

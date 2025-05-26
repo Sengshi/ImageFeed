@@ -13,13 +13,13 @@ final class ImagesListService {
     private(set) var photos: [Photo] = []
     private let decoder = JSONDecoder()
     private var lastLoadedPage: Int?
-    private var task: URLSessionTask?
+    private var currentTask: URLSessionTask?
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     
     private init() {}
     
     func fetchPhotosNextPage(_ completion: @escaping (Result<String, Error>) -> Void) {
-        guard task == nil else { return }
+        guard currentTask == nil else { return }
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("Ошибка: Токен отсутствует")
@@ -37,26 +37,27 @@ final class ImagesListService {
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                self.task = nil
-
+                self.currentTask = nil
+                
                 if let error = error {
                     print("[ImagesListService]: Ошибка при изменении лайка - \(error.localizedDescription)")
                     completion(.failure(error))
                     return
                 }
-
+                
                 guard let data = data else {
                     print("[ImagesListService]: Нет данных для обработки")
                     completion(.failure(NetworkError.invalidResponse))
                     return
                 }
-
+                
                 do {
                     let newPhotosResult = try self.decoder.decode([PhotoResult].self, from: data)
                     let newPhotos = newPhotosResult.map { Photo(from: $0) }
                     self.photos.append(contentsOf: newPhotos)
                     self.lastLoadedPage = nextPage
                     NotificationCenter.default.post(name: ImagesListService.didChangeNotification, object: self)
+                    completion(.success("Фотографии успешно загружены"))
                 } catch {
                     print("[ImagesListService]: Ошибка при декодировании данных - \(error.localizedDescription)")
                     completion(.failure(error))
@@ -64,9 +65,8 @@ final class ImagesListService {
             }
         }
         
-        self.task = task
+        self.currentTask = task
         task.resume()
-        
     }
     
     private func makePhotosNextPage(token: String, nextPage: Int) -> URLRequest? {
@@ -82,10 +82,10 @@ final class ImagesListService {
     }
     
     func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
-        guard task == nil else { return }
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("Ошибка: Токен отсутствует")
+            completion(.failure(NetworkError.unauthorized))
             return
         }
         
@@ -98,7 +98,7 @@ final class ImagesListService {
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                self.task = nil
+                self.currentTask = nil
                 
                 if let error = error {
                     print("[ImagesListService]: Ошибка при изменении лайка - \(error.localizedDescription)")
@@ -122,7 +122,7 @@ final class ImagesListService {
             }
         }
         
-        self.task = task
+        self.currentTask = task 
         task.resume()
     }
     
@@ -143,7 +143,7 @@ final class ImagesListService {
         photos = []
         lastLoadedPage = nil
         OAuth2TokenStorage.shared.token = nil
-        task?.cancel()
-        task = nil
+        currentTask?.cancel()
+        currentTask = nil
     }
 }
